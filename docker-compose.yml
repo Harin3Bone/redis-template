@@ -4,20 +4,20 @@ services:
   redis:
     image: redis
     container_name: redis
-    ports:
-      - 6379:6379
     networks:
       - redis-net
+    ports:
+      - 6379:6379
 
   redis-insight:
     image: redislabs/redisinsight:latest
     container_name: redis-insight
-    ports:
-      - 8001:8001
     volumes:
       - redis-vol:/db
     networks:
       - redis-net
+    ports:
+      - 8001:8001
 
 volumes:
   redis-vol:
