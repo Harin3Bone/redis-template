@@ -1,0 +1,28 @@
+version: '3.3'
+
+services:
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - redis-net
+
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis-insight
+    ports:
+      - 8001:8001
+    volumes:
+      - redis-vol:/db
+    networks:
+      - redis-net
+
+volumes:
+  redis-vol:
+    driver: local
+
+networks:
+  redis-net:
+    driver: bridge
