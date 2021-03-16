@@ -11,11 +11,11 @@ This repository made for build simple of Redis with docker.
 
 ## Quick Start
 ```bash
-    docker-compose up -d
+docker-compose up -d
 ```
 
 ## Reference
-[Docker Hub](https://hub.docker.com/_/redis)
+[Docker Hub](https://hub.docker.com/_/redis)<br>
 [Redislabs](https://docs.redislabs.com/latest/ri/installing/install-docker/)
 
 ## Contributor
