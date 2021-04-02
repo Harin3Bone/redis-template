@@ -4,6 +4,12 @@
 [1.0.0](#vone) <br>
 [1.0.1](#vonepzeromone) <br>
 [1.0.2](#vonepzeromtwo) <br>
+[1.0.3](#vonepzeromthree) <br>
+
+<h2 id="vonepzeromthree">v1.0.3</h2>
+<img src="https://img.shields.io/badge/UPDATE-2496ED?style=flat-square"/>&nbsp;
+
+* Update setup in `README.md`
 
 <h2 id="vonepzeromtwo">v1.0.2</h2>
 <img src="https://img.shields.io/badge/FIX-FFE12B?style=flat-square"/>&nbsp;
