@@ -11,8 +11,15 @@ This repository made for build simple of Redis with docker.
 
 ## Quick Start
 ```bash
-docker-compose up -d
+time ./quick-start.sh
 ```
+
+## Default Value
+Create `.env` file to define your own value
+| Variable name | Defualt value | Datatype | Description |
+|:--------------|:--------------|:--------:|------------:|
+| REDIS_PORT | 6379 | number | Redis server port |
+| INSIGHT_PORT | 8001 | number | Redis manage port |
 
 ## Setup
 **Step 1:** Add `Redis` node into your `docker-compose.yml`
@@ -58,6 +65,14 @@ networks:
   redis-net:
     driver: bridge
 ```
+**Step 7:** Copy `default.env` to `.env` for define value
+```bash
+cp default.env .env
+```
+By the way you can rename `default.env` to `.env` as well
+```bash
+mv -f defualt.env .env
+```
 
 Then `docker-compose.yml` will look like this
 ```yaml
@@ -70,7 +85,7 @@ services:
     networks:
       - redis-net
     ports:
-      - 6379:6379
+      - ${REDIS_PORT}:6379
 
   redis-insight:
     image: redislabs/redisinsight:latest
@@ -80,7 +95,7 @@ services:
     networks:
       - redis-net
     ports:
-      - 8001:8001
+      - ${INSIGHT_PORT}:8001
 
 volumes:
   redis-vol:
@@ -89,6 +104,10 @@ volumes:
 networks:
   redis-net:
     driver: bridge
+```
+**Step 8:** Start server
+```bash
+docker-compose up -d
 ```
 
 ## Reference
