@@ -11,6 +11,104 @@ This repository made for build simple of Redis with docker.
 
 ## Quick Start
 ```bash
+time ./quick-start.sh
+```
+
+## Default Value
+Create `.env` file to define your own value
+| Variable name | Defualt value | Datatype | Description |
+|:--------------|:--------------|:--------:|------------:|
+| REDIS_PORT | 6379 | number | Redis server port |
+| REDIS_PASSWORD | password | String | Redis server password |
+| INSIGHT_PORT | 8001 | number | Redis manage port |
+
+## Setup
+**Step 1:** Add `Redis` node into your `docker-compose.yml`
+```yaml
+version: '3.3'
+
+services:
+  redis:
+    image: redis
+    command: redis --requirepass ${REDIS_PASSWORD}
+    container_name: redis
+    networks:
+      - redis-net
+```
+**Step 2:** Add default port of redis in ports
+```yaml
+    ports:
+      - ${REDIS_PORT}:6379
+```
+**Step 3:** Add `Redis Insight` node into your `docker-compose.yml`
+```yaml
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis-insight
+    volumes:
+      - redis-vol:/db
+    networks:
+      - redis-net
+```
+**Step 4:** Add default port of redis insight in ports
+```yaml
+    ports:
+      - ${INSIGHT_PORT}:8001
+```
+**Step 5:** Add the volume description
+```yaml
+volumes:
+  redis-vol:
+    driver: local
+```
+**Step 6:** Add the network description
+```yaml
+networks:
+  redis-net:
+    driver: bridge
+```
+**Step 7:** Copy `default.env` to `.env` for define value
+```bash
+cp default.env .env
+```
+By the way you can rename `default.env` to `.env` as well
+```bash
+mv -f defualt.env .env
+```
+
+Then `docker-compose.yml` will look like this
+```yaml
+version: '3.3'
+
+services:
+  redis:
+    image: redis
+    container_name: redis
+    networks:
+      - redis-net
+    ports:
+      - ${REDIS_PORT}:6379
+
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis-insight
+    volumes:
+      - redis-vol:/db
+    networks:
+      - redis-net
+    ports:
+      - ${INSIGHT_PORT}:8001
+
+volumes:
+  redis-vol:
+    driver: local
+
+networks:
+  redis-net:
+    driver: bridge
+```
+**Step 8:** Start server
+```bash
 docker-compose up -d
 ```
 

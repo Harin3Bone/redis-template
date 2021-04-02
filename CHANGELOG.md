@@ -4,6 +4,33 @@
 [1.0.0](#vone) <br>
 [1.0.1](#vonepzeromone) <br>
 [1.0.2](#vonepzeromtwo) <br>
+[1.0.3](#vonepzeromthree) <br>
+[2.0.0](#vtwo) <br>
+[2.1.0](#vtwopone) <br>
+
+
+<h2 id="vtwopone">v2.1.0</h2>
+<img src="https://img.shields.io/badge/UPDATE-2496ED?style=flat-square"/>&nbsp;
+
+* Update step in `README.md`
+* Update command password in `docker-compose.yml`
+* Update password variable in `default.env`
+
+<h2 id="vtwo">v2.0.0</h2>
+<img src="https://img.shields.io/badge/NEW-6db33f?style=flat-square"/>&nbsp;
+
+* New `quick-start.sh`
+* New `default.env`
+
+<img src="https://img.shields.io/badge/UPDATE-2496ED?style=flat-square"/>&nbsp;
+
+* Update step in `README.md`
+* Update variable in `docker-compose.yml`
+
+<h2 id="vonepzeromthree">v1.0.3</h2>
+<img src="https://img.shields.io/badge/UPDATE-2496ED?style=flat-square"/>&nbsp;
+
+* Update setup in `README.md`
 
 <h2 id="vonepzeromtwo">v1.0.2</h2>
 <img src="https://img.shields.io/badge/FIX-FFE12B?style=flat-square"/>&nbsp;
