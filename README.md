@@ -44,7 +44,7 @@ services:
 **Step 4:** Add default port of redis insight in ports
 ```yaml
     ports:
-      - {INSIGHT_PORT}:8001
+      - ${INSIGHT_PORT}:8001
 ```
 **Step 5:** Add the volume description
 ```yaml
