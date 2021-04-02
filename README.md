@@ -19,6 +19,7 @@ Create `.env` file to define your own value
 | Variable name | Defualt value | Datatype | Description |
 |:--------------|:--------------|:--------:|------------:|
 | REDIS_PORT | 6379 | number | Redis server port |
+| REDIS_PASSWORD | password | String | Redis server password |
 | INSIGHT_PORT | 8001 | number | Redis manage port |
 
 ## Setup
@@ -29,6 +30,7 @@ version: '3.3'
 services:
   redis:
     image: redis
+    command: redis --requirepass ${REDIS_PASSWORD}
     container_name: redis
     networks:
       - redis-net
