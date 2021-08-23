@@ -21,6 +21,7 @@ Create `.env` file to define your own value
 | REDIS_PORT | 6379 | number | Redis server port |
 | REDIS_PASSWORD | password | String | Redis server password |
 | INSIGHT_PORT | 8001 | number | Redis manage port |
+| TIMEZONE | "Asia/Bangkok" | String | Server timezone |
 
 ## Setup
 **Step 1:** Add `Redis` node into your `docker-compose.yml`
@@ -33,7 +34,7 @@ services:
     command: redis --requirepass ${REDIS_PASSWORD}
     container_name: redis
     networks:
-      - redis-net
+      - net
 ```
 **Step 2:** Add default port of redis in ports
 ```yaml
@@ -46,9 +47,9 @@ services:
     image: redislabs/redisinsight:latest
     container_name: redis-insight
     volumes:
-      - redis-vol:/db
+      - vol:/db
     networks:
-      - redis-net
+      - net
 ```
 **Step 4:** Add default port of redis insight in ports
 ```yaml
@@ -58,13 +59,13 @@ services:
 **Step 5:** Add the volume description
 ```yaml
 volumes:
-  redis-vol:
+  vol:
     driver: local
 ```
 **Step 6:** Add the network description
 ```yaml
 networks:
-  redis-net:
+  net:
     driver: bridge
 ```
 **Step 7:** Copy `default.env` to `.env` for define value
@@ -86,7 +87,7 @@ services:
     command: redis --requirepass ${REDIS_PASSWORD}
     container_name: redis
     networks:
-      - redis-net
+      - net
     ports:
       - ${REDIS_PORT}:6379
 
@@ -94,18 +95,18 @@ services:
     image: redislabs/redisinsight:latest
     container_name: redis-insight
     volumes:
-      - redis-vol:/db
+      - vol:/db
     networks:
-      - redis-net
+      - net
     ports:
       - ${INSIGHT_PORT}:8001
 
 volumes:
-  redis-vol:
+  vol:
     driver: local
 
 networks:
-  redis-net:
+  net:
     driver: bridge
 ```
 **Step 8:** Start server
@@ -113,9 +114,84 @@ networks:
 docker-compose up -d
 ```
 
+## Next Step Setup
+**Step 1** Create `Dockerfile` for Redis
+```Dockerfile
+FROM redis
+ARG conf
+COPY ${conf} /etc/redis/redis.conf.default
+```
+
+**Step 2** Edit `docker-compose.yml` into this
+```yaml
+version: '3.3'
+
+services:
+  redis:
+    build: 
+      context: .
+      args: 
+        - conf=./redis.conf
+      dockerfile: Dockerfile
+    image: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    container_name: redis
+    networks:
+      - net
+    ports:
+      - ${REDIS_PORT}:6379
+    environment: 
+      - TZ=${TIMEZONE}
+    restart: always
+
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis-insight
+    volumes:
+      - vol:/db
+    networks:
+      - net
+    ports:
+      - ${INSIGHT_PORT}:8001
+    environment: 
+      - TZ=${TIMEZONE}
+    depends_on: 
+      - redis
+    restart: always
+
+volumes:
+  vol:
+    driver: local
+
+networks:
+  net:
+    driver: bridge
+```
+Indeed in new `docker-compose.yml` just change from pulling raw image to build image by `Dockerfile` because i just want to copy `redis.conf` into redis
+
+## Redis CLI
+Run docker command to access redis server
+```bash
+docker exec -it redis redis-cli
+```
+After access to redis-cli you should be see interface like this
+```
+127.0.0.1:6379>
+```
+And then before do anything you must login first.
+```
+AUTH [username] [password]
+```
+Example
+```
+AUTH default password
+```
+
 ## Reference
 [Docker Hub](https://hub.docker.com/_/redis)<br>
-[Redislabs](https://docs.redislabs.com/latest/ri/installing/install-docker/)
+[Redis](https://redis.io/commands)<br>
+[Redislabs](https://docs.redislabs.com/latest/ri/installing/install-docker/)<br>
+[Configuration](https://redis.io/topics/config)
 
 ## Contributor
 <a href="https://github.com/Harin3Bone"><img src="https://img.shields.io/badge/Harin3Bone-181717?style=flat&logo=github&logoColor=ffffff"></a>
