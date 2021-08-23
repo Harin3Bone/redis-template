@@ -21,6 +21,7 @@ Create `.env` file to define your own value
 | REDIS_PORT | 6379 | number | Redis server port |
 | REDIS_PASSWORD | password | String | Redis server password |
 | INSIGHT_PORT | 8001 | number | Redis manage port |
+| TIMEZONE | "Asia/Bangkok" | String | Server timezone |
 
 ## Setup
 **Step 1:** Add `Redis` node into your `docker-compose.yml`
@@ -113,6 +114,61 @@ networks:
 docker-compose up -d
 ```
 
+## Next Step Setup
+**Step 1** Create `Dockerfile` for Redis
+```Dockerfile
+FROM redis
+ARG conf
+COPY ${conf} /etc/redis/redis.conf.default
+```
+
+**Step 2** Edit `docker-compose.yml` into this
+```yaml
+version: '3.3'
+
+services:
+  redis:
+    build: 
+      context: .
+      args: 
+        - conf=./redis.conf
+      dockerfile: Dockerfile
+    image: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    container_name: redis
+    networks:
+      - net
+    ports:
+      - ${REDIS_PORT}:6379
+    environment: 
+      - TZ=${TIMEZONE}
+    restart: always
+
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis-insight
+    volumes:
+      - vol:/db
+    networks:
+      - net
+    ports:
+      - ${INSIGHT_PORT}:8001
+    environment: 
+      - TZ=${TIMEZONE}
+    depends_on: 
+      - redis
+    restart: always
+
+volumes:
+  vol:
+    driver: local
+
+networks:
+  net:
+    driver: bridge
+```
+Indeed in new `docker-compose.yml` just change from pulling raw image to build image by `Dockerfile` because i just want to copy `redis.conf` into redis
+
 ## Redis CLI
 Run docker command to access redis server
 ```bash
@@ -134,7 +190,8 @@ AUTH default password
 ## Reference
 [Docker Hub](https://hub.docker.com/_/redis)<br>
 [Redis](https://redis.io/commands)<br>
-[Redislabs](https://docs.redislabs.com/latest/ri/installing/install-docker/)
+[Redislabs](https://docs.redislabs.com/latest/ri/installing/install-docker/)<br>
+[Configuration](https://redis.io/topics/config)
 
 ## Contributor
 <a href="https://github.com/Harin3Bone"><img src="https://img.shields.io/badge/Harin3Bone-181717?style=flat&logo=github&logoColor=ffffff"></a>
