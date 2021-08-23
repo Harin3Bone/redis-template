@@ -7,6 +7,12 @@
 [1.0.3](#vonepzeromthree) <br>
 [2.0.0](#vtwo) <br>
 [2.1.0](#vtwopone) <br>
+[2.1.1](#vtwoponeoone) <br>
+
+<h2 id="vtwopone">v2.1.1</h2>
+<img src="https://img.shields.io/badge/FIX-FFE12B?style=flat-square"/>&nbsp;
+
+* Fix missing password in "Then `docker-compose.yml`" in `README.md`
 
 
 <h2 id="vtwopone">v2.1.0</h2>
