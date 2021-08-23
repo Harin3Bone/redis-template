@@ -114,7 +114,7 @@ networks:
 docker-compose up -d
 ```
 
-## Next Step Setup
+## Intermediate Setup
 **Step 1** Create `Dockerfile` for Redis
 ```Dockerfile
 FROM redis
@@ -167,7 +167,8 @@ networks:
   net:
     driver: bridge
 ```
-Indeed in new `docker-compose.yml` just change from pulling raw image to build image by `Dockerfile` because i just want to copy `redis.conf` into redis
+> ### **Actually** 
+> in new `docker-compose.yml` just change from pulling raw image to build image by `Dockerfile` because i just want to copy `redis.conf` into redis
 
 ## Redis CLI
 Run docker command to access redis server
