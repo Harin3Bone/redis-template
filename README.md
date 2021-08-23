@@ -83,6 +83,7 @@ version: '3.3'
 services:
   redis:
     image: redis
+    command: redis --requirepass ${REDIS_PASSWORD}
     container_name: redis
     networks:
       - redis-net
