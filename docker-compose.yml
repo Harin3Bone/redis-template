@@ -3,27 +3,31 @@ version: '3.3'
 services:
   redis:
     image: redis
-    command: redis --requirepass ${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD}
     container_name: redis
     networks:
-      - redis-net
+      - net
     ports:
       - ${REDIS_PORT}:6379
+    restart: always
 
   redis-insight:
     image: redislabs/redisinsight:latest
     container_name: redis-insight
     volumes:
-      - redis-vol:/db
+      - vol:/db
     networks:
-      - redis-net
+      - net
     ports:
       - ${INSIGHT_PORT}:8001
+    depends_on: 
+      - redis
+    restart: always
 
 volumes:
-  redis-vol:
+  vol:
     driver: local
 
 networks:
-  redis-net:
+  net:
     driver: bridge
