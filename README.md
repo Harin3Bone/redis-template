@@ -33,7 +33,7 @@ services:
     command: redis --requirepass ${REDIS_PASSWORD}
     container_name: redis
     networks:
-      - redis-net
+      - net
 ```
 **Step 2:** Add default port of redis in ports
 ```yaml
@@ -46,9 +46,9 @@ services:
     image: redislabs/redisinsight:latest
     container_name: redis-insight
     volumes:
-      - redis-vol:/db
+      - vol:/db
     networks:
-      - redis-net
+      - net
 ```
 **Step 4:** Add default port of redis insight in ports
 ```yaml
@@ -58,13 +58,13 @@ services:
 **Step 5:** Add the volume description
 ```yaml
 volumes:
-  redis-vol:
+  vol:
     driver: local
 ```
 **Step 6:** Add the network description
 ```yaml
 networks:
-  redis-net:
+  net:
     driver: bridge
 ```
 **Step 7:** Copy `default.env` to `.env` for define value
@@ -86,7 +86,7 @@ services:
     command: redis --requirepass ${REDIS_PASSWORD}
     container_name: redis
     networks:
-      - redis-net
+      - net
     ports:
       - ${REDIS_PORT}:6379
 
@@ -94,18 +94,18 @@ services:
     image: redislabs/redisinsight:latest
     container_name: redis-insight
     volumes:
-      - redis-vol:/db
+      - vol:/db
     networks:
-      - redis-net
+      - net
     ports:
       - ${INSIGHT_PORT}:8001
 
 volumes:
-  redis-vol:
+  vol:
     driver: local
 
 networks:
-  redis-net:
+  net:
     driver: bridge
 ```
 **Step 8:** Start server
@@ -113,8 +113,27 @@ networks:
 docker-compose up -d
 ```
 
+## Redis CLI
+Run docker command to access redis server
+```bash
+docker exec -it redis redis-cli
+```
+After access to redis-cli you should be see interface like this
+```
+127.0.0.1:6379>
+```
+And then before do anything you must login first.
+```
+AUTH [username] [password]
+```
+Example
+```
+AUTH default password
+```
+
 ## Reference
 [Docker Hub](https://hub.docker.com/_/redis)<br>
+[Redis](https://redis.io/commands)<br>
 [Redislabs](https://docs.redislabs.com/latest/ri/installing/install-docker/)
 
 ## Contributor
