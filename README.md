@@ -18,144 +18,91 @@ time ./quick-start.sh
 Create `.env` file to define your own value
 | Variable name | Defualt value | Datatype | Description |
 |:--------------|:--------------|:--------:|------------:|
+| REDIS_VERSION | 6.2.5 | String | Redis image version |
 | REDIS_PORT | 6379 | number | Redis server port |
 | REDIS_PASSWORD | password | String | Redis server password |
-| INSIGHT_PORT | 8001 | number | Redis manage port |
+| INSIGHT_VERSION | latest | String | RedisLabs image version |
+| INSIGHT_PORT | 8001 | number | RedisLabs server port |
 | TIMEZONE | "Asia/Bangkok" | String | Server timezone |
 
 ## Setup
-**Step 1:** Add `Redis` node into your `docker-compose.yml`
+**Step 1:** Add `Redis` service into your `docker-compose.yml`
 ```yaml
-version: '3.3'
-
 services:
   redis:
-    image: redis
-    command: redis --requirepass ${REDIS_PASSWORD}
+    image: redis:${REDIS_VERISON:-6.2.5}
+    command: redis-server --requirepass ${REDIS_PASSWORD:-password}
     container_name: redis
     networks:
       - net
-```
-**Step 2:** Add default port of redis in ports
-```yaml
     ports:
-      - ${REDIS_PORT}:6379
+      - ${REDIS_PORT:-6379}:6379
+    environment:
+      TZ: ${TIMEZONE:-"Asia/Bangkok"}
+    restart: always
 ```
-**Step 3:** Add `Redis Insight` node into your `docker-compose.yml`
+
+**Step 2:** Add `Redis Insight` service into your `docker-compose.yml`
 ```yaml
   redis-insight:
-    image: redislabs/redisinsight:latest
+    image: redislabs/redisinsight:${INSIGHT_VERSION:-latest}
     container_name: redis-insight
     volumes:
       - vol:/db
     networks:
       - net
-```
-**Step 4:** Add default port of redis insight in ports
-```yaml
     ports:
-      - ${INSIGHT_PORT}:8001
+      - ${INSIGHT_PORT:-8001}:8001
+    environment:
+      TZ: ${TIMEZONE:-"Asia/Bangkok"}
+    depends_on:
+      - redis
+    restart: always
 ```
-**Step 5:** Add the volume description
+
+**Step 3:** Add the network description
 ```yaml
 volumes:
   vol:
     driver: local
 ```
-**Step 6:** Add the network description
+
+**Step 4:** Add the network description
 ```yaml
 networks:
   net:
     driver: bridge
-```
-**Step 7:** Copy `default.env` to `.env` for define value
-```bash
-cp default.env .env
-```
-By the way you can rename `default.env` to `.env` as well
-```bash
-mv -f defualt.env .env
 ```
 
 Then `docker-compose.yml` will look like this
 ```yaml
-version: '3.3'
+version: "3.8"
 
 services:
   redis:
-    image: redis
-    command: redis --requirepass ${REDIS_PASSWORD}
+    image: redis:${REDIS_VERISON:-6.2.5}
+    command: redis-server --requirepass ${REDIS_PASSWORD:-password}
     container_name: redis
     networks:
       - net
     ports:
-      - ${REDIS_PORT}:6379
-
-  redis-insight:
-    image: redislabs/redisinsight:latest
-    container_name: redis-insight
-    volumes:
-      - vol:/db
-    networks:
-      - net
-    ports:
-      - ${INSIGHT_PORT}:8001
-
-volumes:
-  vol:
-    driver: local
-
-networks:
-  net:
-    driver: bridge
-```
-**Step 8:** Start server
-```bash
-docker-compose up -d
-```
-
-## Intermediate Setup
-**Step 1** Create `Dockerfile` for Redis
-```Dockerfile
-FROM redis
-ARG conf
-COPY ${conf} /etc/redis/redis.conf.default
-```
-
-**Step 2** Edit `docker-compose.yml` into this
-```yaml
-version: '3.3'
-
-services:
-  redis:
-    build: 
-      context: .
-      args: 
-        - conf=./redis.conf
-      dockerfile: Dockerfile
-    image: redis
-    command: redis-server --requirepass ${REDIS_PASSWORD}
-    container_name: redis
-    networks:
-      - net
-    ports:
-      - ${REDIS_PORT}:6379
-    environment: 
-      - TZ=${TIMEZONE}
+      - ${REDIS_PORT:-6379}:6379
+    environment:
+      TZ: ${TIMEZONE:-"Asia/Bangkok"}
     restart: always
 
   redis-insight:
-    image: redislabs/redisinsight:latest
+    image: redislabs/redisinsight:${INSIGHT_VERSION:-latest}
     container_name: redis-insight
     volumes:
       - vol:/db
     networks:
       - net
     ports:
-      - ${INSIGHT_PORT}:8001
-    environment: 
-      - TZ=${TIMEZONE}
-    depends_on: 
+      - ${INSIGHT_PORT:-8001}:8001
+    environment:
+      TZ: ${TIMEZONE:-"Asia/Bangkok"}
+    depends_on:
       - redis
     restart: always
 
@@ -166,6 +113,36 @@ volumes:
 networks:
   net:
     driver: bridge
+```
+
+**Step 5:** Start server
+```bash
+docker-compose up -d
+```
+
+## Redis Configuration File
+**Step 1** Download `redis.conf` template to set advance configuration of `Redis` from this link [Click here](https://redis.io/topics/config)
+
+**Step 2** Edit `Redis` service in `docker-compose.yml` into this
+```yaml
+  redis:
+    image: redis:${REDIS_VERISON:-6.2.5}
+    command: redis-server --requirepass ${REDIS_PASSWORD:-password}
+    container_name: redis
+    volumes:
+      - ./redis.conf:/etc/redis/redis.conf.default
+    networks:
+      - net
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    environment:
+      TZ: ${TIMEZONE:-"Asia/Bangkok"}
+    restart: always
+```
+
+**Step 3:** Start server
+```bash
+docker-compose up -d
 ```
 > ### **Actually** 
 > in new `docker-compose.yml` just change from pulling raw image to build image by `Dockerfile` because i just want to copy `redis.conf` into redis
