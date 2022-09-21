@@ -22,7 +22,7 @@ services:
     restart: on-failure
 
   redis-insight:
-    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.12.1}
+    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.12.0}
     container_name: redis-insight
     volumes:
       - insight_data:/db
