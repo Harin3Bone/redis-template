@@ -26,8 +26,8 @@ docker-compose up -d
 
 sleep 1 
 
-echo "RabbitMQ server running http://localhost:5672"
-echo "RabbitMQ management running http://localhost:15672"
+echo "Redis server running http://localhost:6379"
+echo "Redis management running http://localhost:8001"
 echo "username: root"
 echo "password: password"
 
