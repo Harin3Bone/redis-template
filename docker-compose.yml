@@ -7,6 +7,7 @@ services:
     container_name: redis
     volumes:
       - ./redis.conf:/etc/redis/redis.conf.default
+      - redis_data:/data
     networks:
       - net
     ports:
@@ -19,7 +20,7 @@ services:
     image: redislabs/redisinsight:${INSIGHT_VERSION:-latest}
     container_name: redis-insight
     volumes:
-      - vol:/db
+      - insight_data:/db
     networks:
       - net
     ports:
@@ -31,9 +32,12 @@ services:
     restart: always
 
 volumes:
-  vol:
-    driver: local
+  redis_data:
+    name: redis_data_volume
+  insight_data:
+    name: redis_insight_volume
 
 networks:
   net:
+    name: redis_network
     driver: bridge
