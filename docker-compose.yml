@@ -22,7 +22,7 @@ services:
     restart: on-failure
 
   redis-insight:
-    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.12.0}
+    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.13.0}
     container_name: redis-insight
     volumes:
       - insight_data:/db
@@ -39,8 +39,10 @@ services:
 volumes:
   redis_data:
     name: redis_data_volume
+    driver: local
   insight_data:
     name: redis_insight_volume
+    driver: local
 
 networks:
   net:
