@@ -16,39 +16,48 @@ time ./quick-start.sh
 
 ## Default Value
 Create `.env` file to define your own value
+
 | Variable name | Defualt value | Datatype | Description |
 |:--------------|:--------------|:--------:|------------:|
-| REDIS_VERSION | 6.2.5 | String | Redis image version |
+| REDIS_VERSION | 7.0.4 | String | Redis image version |
 | REDIS_PORT | 6379 | number | Redis server port |
 | REDIS_PASSWORD | password | String | Redis server password |
-| INSIGHT_VERSION | latest | String | RedisLabs image version |
+| INSIGHT_VERSION | 1.13.0 | String | RedisLabs image version |
 | INSIGHT_PORT | 8001 | number | RedisLabs server port |
 | TIMEZONE | "Asia/Bangkok" | String | Server timezone |
 
 ## Setup
+
 **Step 1:** Add `Redis` service into your `docker-compose.yml`
 ```yaml
 services:
   redis:
-    image: redis:${REDIS_VERISON:-6.2.5}
+    image: redis:${REDIS_VERSION:-7.0.4}
     command: redis-server --requirepass ${REDIS_PASSWORD:-password}
     container_name: redis
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - redis_data:/data
     networks:
       - net
     ports:
       - ${REDIS_PORT:-6379}:6379
     environment:
       TZ: ${TIMEZONE:-"Asia/Bangkok"}
-    restart: always
+    restart: on-failure
 ```
 
 **Step 2:** Add `Redis Insight` service into your `docker-compose.yml`
 ```yaml
   redis-insight:
-    image: redislabs/redisinsight:${INSIGHT_VERSION:-latest}
+    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.13.0}
     container_name: redis-insight
     volumes:
-      - vol:/db
+      - insight_data:/db
     networks:
       - net
     ports:
@@ -63,7 +72,11 @@ services:
 **Step 3:** Add the network description
 ```yaml
 volumes:
-  vol:
+  redis_data:
+    name: redis_data_volume
+    driver: local
+  insight_data:
+    name: redis_insight_volume
     driver: local
 ```
 
@@ -71,6 +84,7 @@ volumes:
 ```yaml
 networks:
   net:
+    name: redis_network
     driver: bridge
 ```
 
@@ -80,22 +94,30 @@ version: "3.8"
 
 services:
   redis:
-    image: redis:${REDIS_VERISON:-6.2.5}
-    command: redis-server --requirepass ${REDIS_PASSWORD:-password}
+    image: redis:${REDIS_VERSION:-7.0.4}
     container_name: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-password}
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - ./redis.conf:/etc/redis/redis.conf.default
+      - redis_data:/data
     networks:
       - net
     ports:
       - ${REDIS_PORT:-6379}:6379
     environment:
       TZ: ${TIMEZONE:-"Asia/Bangkok"}
-    restart: always
+    restart: on-failure
 
   redis-insight:
-    image: redislabs/redisinsight:${INSIGHT_VERSION:-latest}
+    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.13.0}
     container_name: redis-insight
     volumes:
-      - vol:/db
+      - insight_data:/db
     networks:
       - net
     ports:
@@ -107,12 +129,16 @@ services:
     restart: always
 
 volumes:
-  vol:
-    driver: local
+  redis_data:
+    name: redis_data_volume
+  insight_data:
+    name: redis_insight_volume
 
 networks:
   net:
+    name: redis_network
     driver: bridge
+
 ```
 
 **Step 5:** Start server
@@ -126,25 +152,31 @@ docker-compose up -d
 **Step 2** Edit `Redis` service in `docker-compose.yml` into this
 ```yaml
   redis:
-    image: redis:${REDIS_VERISON:-6.2.5}
-    command: redis-server --requirepass ${REDIS_PASSWORD:-password}
+    image: redis:${REDIS_VERSION:-7.0.4}
     container_name: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-password}
+      healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 3
     volumes:
       - ./redis.conf:/etc/redis/redis.conf.default
+      - redis_data:/data
     networks:
       - net
     ports:
       - ${REDIS_PORT:-6379}:6379
     environment:
       TZ: ${TIMEZONE:-"Asia/Bangkok"}
-    restart: always
+    restart: on-failure
 ```
 
 **Step 3:** Start server
 ```bash
 docker-compose up -d
 ```
-> ### **Actually** 
+> ### **Important** 
 > in new `docker-compose.yml` just change from pulling raw image to build image by `Dockerfile` because i just want to copy `redis.conf` into redis
 
 ## Redis CLI
