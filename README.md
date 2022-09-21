@@ -18,10 +18,10 @@ time ./quick-start.sh
 Create `.env` file to define your own value
 | Variable name | Defualt value | Datatype | Description |
 |:--------------|:--------------|:--------:|------------:|
-| REDIS_VERSION | 6.2.5 | String | Redis image version |
+| REDIS_VERSION | 7.0.4 | String | Redis image version |
 | REDIS_PORT | 6379 | number | Redis server port |
 | REDIS_PASSWORD | password | String | Redis server password |
-| INSIGHT_VERSION | latest | String | RedisLabs image version |
+| INSIGHT_VERSION | 1.12.1 | String | RedisLabs image version |
 | INSIGHT_PORT | 8001 | number | RedisLabs server port |
 | TIMEZONE | "Asia/Bangkok" | String | Server timezone |
 
@@ -30,7 +30,7 @@ Create `.env` file to define your own value
 ```yaml
 services:
   redis:
-    image: redis:${REDIS_VERISON:-6.2.5}
+    image: redis:${REDIS_VERSION:-7.0.4}
     command: redis-server --requirepass ${REDIS_PASSWORD:-password}
     container_name: redis
     networks:
@@ -45,7 +45,7 @@ services:
 **Step 2:** Add `Redis Insight` service into your `docker-compose.yml`
 ```yaml
   redis-insight:
-    image: redislabs/redisinsight:${INSIGHT_VERSION:-latest}
+    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.12.1}
     container_name: redis-insight
     volumes:
       - vol:/db
@@ -80,7 +80,7 @@ version: "3.8"
 
 services:
   redis:
-    image: redis:${REDIS_VERISON:-6.2.5}
+    image: redis:${REDIS_VERSION:-7.0.4}
     command: redis-server --requirepass ${REDIS_PASSWORD:-password}
     container_name: redis
     networks:
@@ -92,7 +92,7 @@ services:
     restart: always
 
   redis-insight:
-    image: redislabs/redisinsight:${INSIGHT_VERSION:-latest}
+    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.12.1}
     container_name: redis-insight
     volumes:
       - vol:/db
@@ -126,7 +126,7 @@ docker-compose up -d
 **Step 2** Edit `Redis` service in `docker-compose.yml` into this
 ```yaml
   redis:
-    image: redis:${REDIS_VERISON:-6.2.5}
+    image: redis:${REDIS_VERSION:-7.0.4}
     command: redis-server --requirepass ${REDIS_PASSWORD:-password}
     container_name: redis
     volumes:
