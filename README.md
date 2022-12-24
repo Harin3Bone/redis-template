@@ -147,15 +147,14 @@ docker-compose up -d
 ```
 
 ## Redis Configuration File
-**Step 1** Download `redis.conf` template to set advance configuration of `Redis` from this link [Click here](https://redis.io/topics/config)
+**Step 1** Download `redis.conf` template to set advance configuration of `Redis` from this link [Click here](https://redis.io/docs/management/config-file/)
 
 **Step 2** Edit `Redis` service in `docker-compose.yml` into this
 ```yaml
   redis:
     image: redis:${REDIS_VERSION:-7.0.4}
     container_name: redis
-    command: redis-server --requirepass ${REDIS_PASSWORD:-password}
-      healthcheck:
+    healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 5s
       timeout: 30s
@@ -171,8 +170,13 @@ docker-compose up -d
       TZ: ${TIMEZONE:-"Asia/Bangkok"}
     restart: on-failure
 ```
+**Step 3:** Update configuration uncomment or add `requirepass` in `redis.conf`
 
-**Step 3:** Start server
+```redis.conf
+requirepass ${REDIS_PASSWORD}
+```
+
+**Step 4:** Start server
 ```bash
 docker-compose up -d
 ```
@@ -200,8 +204,9 @@ AUTH default password
 ## Reference
 [Docker Hub](https://hub.docker.com/_/redis)<br>
 [Redis](https://redis.io/commands)<br>
-[Redislabs](https://docs.redislabs.com/latest/ri/installing/install-docker/)<br>
-[Configuration](https://redis.io/topics/config)
+[RedisLabs](https://docs.redislabs.com/latest/ri/installing/install-docker/)<br>
+[Configuration Example](https://redis.io/docs/management/config-file/)<br>
+[Configuration Doc](https://redis.io/topics/config)
 
 ## Contributor
 <a href="https://github.com/Harin3Bone"><img src="https://img.shields.io/badge/Harin3Bone-181717?style=flat&logo=github&logoColor=ffffff"></a>
