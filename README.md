@@ -22,6 +22,7 @@ Create `.env` file to define your own value
 | REDIS_VERSION | 7.0.4 | String | Redis image version |
 | REDIS_PORT | 6379 | number | Redis server port |
 | REDIS_PASSWORD | password | String | Redis server password |
+| REDIS_MEMORY | 500mb | String | Maximum memory size for Redis |
 | INSIGHT_VERSION | 1.13.0 | String | RedisLabs image version |
 | INSIGHT_PORT | 8001 | number | RedisLabs server port |
 | TIMEZONE | "Asia/Bangkok" | String | Server timezone |
