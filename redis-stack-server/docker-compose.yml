@@ -16,11 +16,7 @@ services:
     ports:
       - 6379:6379
     environment:
-      REDIS_ARGS: "
-        --requirepass ${REDIS_PASSWORD:-password} 
-        --maxmemory ${REDIS_MEMORY:-5mb}
-        --maxmemory-policy allkeys-lru
-      "
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD:-password}"
       TZ: ${TIMEZONE:-"Asia/Bangkok"}
     restart: on-failure
 
