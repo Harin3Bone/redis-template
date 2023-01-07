@@ -10,8 +10,9 @@ This repository made for build simple of Redis with docker.
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
 ## Project
-1. [Redis Stack](./redis-stack)
-2. [Redis Server](./redis-stack-server) 
+1. [Redis](./redis)
+2. [Redis Stack](./redis-stack)
+3. [Redis Server](./redis-stack-server) 
 
 ## Contributor
 [![GithubImg](https://img.shields.io/badge/Harin3Bone-181717?style=flat&logo=github&logoColor=ffffff)](https://github.com/Harin3Bone)

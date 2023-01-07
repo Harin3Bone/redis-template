@@ -5,15 +5,6 @@
 ## Description
 This repository made for build simple of Redis with docker
 
-## Additional Detail
-This compose file using `redis/redis-stack` they also have many useful module include:
-- RedisInsight
-- RedisSearch
-- RedisJSON
-- RedisGraph
-- RedisTimeSeries
-- RedisBloom
-
 ## Prerequisite
 * [Docker](https://docs.docker.com/engine/install/ubuntu/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
@@ -26,57 +17,57 @@ time ./quick-start.sh
 ## Default Value
 Create `.env` file to define your own value
 
-| Variable name      | Default value | Datatype |             Description |
-|:-------------------|:--------------|:--------:|------------------------:|
-| REDIS_VERSION      | 7.0.6-RC3     |  String  |     Redis image version |
-| REDIS_PORT         | 6379          |  number  |       Redis server port |
-| REDIS_INSIGHT_PORT | 8001          |  String  |      Redis insight port |
-| REDIS_PASSWORD     | password      |  String  |   Redis server password |
-| TIMEZONE           | 1.13.0        |  String  | RedisLabs image version |
+| Variable name   | Default value | Datatype |             Description |
+|:----------------|:--------------|:--------:|------------------------:|
+| REDIS_VERSION   | 7.0.7         |  String  |     Redis image version |
+| REDIS_PORT      | 6379          |  number  |       Redis server port |
+| REDIS_PASSWORD  | password      |  String  |   Redis server password |
+| INSIGHT_VERSION | 1.13.1        |  String  |   Redis insight version |
+| INSIGHT_PORT    | 8001          |  String  |      Redis insight port |
+| TIMEZONE        | 1.13.0        |  String  | RedisLabs image version |
 
-## Setup
+## Setup Redis
 
 **Step 1:** Add `Redis` service into your `docker-compose.yml`
 ```yaml
 services:
   redis:
-    image: redis/redis-stack-server:${REDIS_VERSION:-7.0.6-RC3}
-    container_name: redis-stack
-    volumes:
-      - redis_data:/data
+    image: redis:${REDIS_VERSION:-7.0.7}
+    container_name: redis
+    command:
+      - "--requirepass ${REDIS_PASSWORD:-password}"
     networks:
-      - net
+      - redis_network
     ports:
       - ${REDIS_PORT:-6379}:6379
-      - ${REDIS_INSIGHT_PORT:-8001}:8001
     environment:
-      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD:-password}"
       TZ: ${TIMEZONE:-"Asia/Bangkok"}
     restart: on-failure
 ```
 **Step 2:** Add the network configuration
 ```yaml
 networks:
-  redis_stack_network:
-    name: redis_stack_network
+  redis_network:
+    name: redis_network
     driver: bridge
 ```
 
 **Step 3:** If you want to bind persistence disk you can add `volumes` in **redis** services like this
 
 ```yaml
+services:
   redis:
-    image: redis/redis-stack:${REDIS_VERSION:-7.0.6-RC3}
-    container_name: redis-stack
+    image: redis:${REDIS_VERSION:-7.0.7}
+    container_name: redis
+    command:
+      - "--requirepass ${REDIS_PASSWORD:-password}"
     volumes:
-      - redis_stack_volume:/data
+      - redis_server_volume:/data
     networks:
-      - net
+      - redis_network
     ports:
       - ${REDIS_PORT:-6379}:6379
-      - ${REDIS_INSIGHT_PORT:-8001}:8001
     environment:
-      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD:-password}"
       TZ: ${TIMEZONE:-"Asia/Bangkok"}
     restart: on-failure
 ```
@@ -84,8 +75,8 @@ Please add volume configuration as well
 
 ```yaml
 volumes:
-  redis_stack_volume:
-    name: redis_stack_volume
+  redis_server_volume:
+    name: redis_server_volume
     driver: local
 ```
 
@@ -96,23 +87,25 @@ volumes:
 **Step 4:** If you want to have something to make sure that your redis have start successfully please add `healthcheck` in **redis**
 
 ```yaml
+services:
   redis:
-    image: redis/redis-stack:${REDIS_VERSION:-7.0.6-RC3}
-    container_name: redis-stack
+    image: redis:${REDIS_VERSION:-7.0.7}
+    container_name: redis
+    command:
+      - "--requirepass ${REDIS_PASSWORD:-password}"
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 5s
       timeout: 30s
       retries: 3
     volumes:
-      - redis_stack_volume:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - redis_server_volume:/data
     networks:
-      - redis_stack_network
+      - redis_network
     ports:
       - ${REDIS_PORT:-6379}:6379
-      - ${REDIS_INSIGHT_PORT:-8001}:8001
     environment:
-      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD:-password}"
       TZ: ${TIMEZONE:-"Asia/Bangkok"}
     restart: on-failure
 ```
@@ -126,29 +119,70 @@ volumes:
 docker-compose up -d
 ```
 
+## Setup Redis Insight
+
+**Step 1:** Add `Redis Insight` service into your `docker-compose.yml`
+
+```yaml
+  redis-insight:
+    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.13.0}
+    container_name: redis-insight
+    volumes:
+      - redis_insight_volume:/db
+    networks:
+      - redis_network
+    ports:
+      - ${INSIGHT_PORT:-8001}:8001
+    environment:
+      TZ: ${TIMEZONE:-"Asia/Bangkok"}
+    depends_on:
+      - redis
+    restart: always
+```
+
+**Step 2:** Add `Redis Insight` volume
+```yaml
+volumes:
+  redis_insight_volume:
+    name: redis_insight_volume
+    driver: local
+```
+
+**Step 3:** Start server
+```bash
+docker-compose up -d
+```
+
+> **Important**
+>
+> Please make sure `redis` and `redis-insight` are at the same network group
+> If they're not in same group `redis-insight` will not found `redis` server.
+
 ## Redis Configuration File
 **Step 1** Download `redis.conf` template to set advance configuration of `Redis` from this link [Click here](https://redis.io/docs/management/config-file/)
 
 **Step 2** Edit `Redis` service in at `volume` section in `docker-compose.yml` like this
 ```yaml
+services:
   redis:
-    image: redis/redis-stack:${REDIS_VERSION:-7.0.6-RC3}
-    container_name: redis-stack
+    image: redis:${REDIS_VERSION:-7.0.7}
+    container_name: redis
     volumes:
-      - ./redis.conf:/redis-stack.conf
-      - redis_stack_volume:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - redis_server_volume:/data
     networks:
-      - redis_stack_network
+      - redis_network
     ports:
       - ${REDIS_PORT:-6379}:6379
-      - ${REDIS_INSIGHT_PORT:-8001}:8001
+    environment:
+      TZ: ${TIMEZONE:-"Asia/Bangkok"}
     restart: on-failure
 ```
 
 > **Tips**
 >
 > If you have redis.conf you can move `REDIS_ARGS` environment into redis.conf instead
-> 
+>
 > **Example**
 > ```redis.conf
 > requirepass <your password>
