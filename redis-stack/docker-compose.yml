@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis/redis-stack:${REDIS_VERSION:-7.0.6-RC3}
+    container_name: redis-stack
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - ./redis.conf:/redis-stack.conf
+      - redis_stack_volume:/data
+    networks:
+      - redis_stack_network
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+      - ${REDIS_INSIGHT_PORT:-8001}:8001
+    environment:
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD:-password}"
+      TZ: ${TIMEZONE:-"Asia/Bangkok"}
+    restart: on-failure
+
+volumes:
+  redis_stack_volume:
+    name: redis_stack_volume
+    driver: local
+
+networks:
+  redis_stack_network:
+    name: redis_stack_network
+    driver: bridge
