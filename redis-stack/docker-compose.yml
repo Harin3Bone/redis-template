@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis/redis-stack:${REDIS_VERSION:-7.0.6-RC3}
+    container_name: redis
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - redis_data:/data
+    networks:
+      - net
+    ports:
+      - 6378:6379
+      - 8002:8001
+    environment:
+      REDIS_ARGS: "
+        --requirepass ${REDIS_PASSWORD:-password} 
+        --maxmemory ${REDIS_MEMORY:-5mb}
+        --maxmemory-policy allkeys-lru
+      "
+      TZ: ${TIMEZONE:-"Asia/Bangkok"}
+    restart: on-failure
+
+#  redis-insight:
+#    image: redislabs/redisinsight:${INSIGHT_VERSION:-1.13.0}
+#    container_name: redis-insight
+#    volumes:
+#      - insight_data:/db
+#    networks:
+#      - net
+#    ports:
+#      - ${INSIGHT_PORT:-8001}:8001
+#    environment:
+#      TZ: ${TIMEZONE:-"Asia/Bangkok"}
+#    depends_on:
+#      - redis
+#    restart: always
+
+volumes:
+  redis_data:
+    name: redis_data_volume
+    driver: local
+  insight_data:
+    name: redis_insight_volume
+    driver: local
+
+networks:
+  net:
+    name: redis_network
+    driver: bridge
