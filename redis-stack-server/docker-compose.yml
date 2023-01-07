@@ -1,20 +1,21 @@
 version: "3.8"
 
 services:
-  redis:
+  redis-stack-server:
     image: redis/redis-stack-server:${REDIS_VERSION:-7.0.6-RC3}
-    container_name: redis
+    container_name: redis-stack-server
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 5s
       timeout: 30s
       retries: 3
     volumes:
-      - redis_data:/data
+      - ./redis.conf:/redis-stack.conf
+      - redis_server_volume:/data
     networks:
-      - net
+      - redis_network
     ports:
-      - 6379:6379
+      - ${REDIS_PORT:-6379}:6379
     environment:
       REDIS_ARGS: "--requirepass ${REDIS_PASSWORD:-password}"
       TZ: ${TIMEZONE:-"Asia/Bangkok"}
@@ -24,9 +25,9 @@ services:
     image: redislabs/redisinsight:${INSIGHT_VERSION:-1.13.0}
     container_name: redis-insight
     volumes:
-      - insight_data:/db
+      - redis_insight_volume:/db
     networks:
-      - net
+      - redis_network
     ports:
       - ${INSIGHT_PORT:-8001}:8001
     environment:
@@ -36,14 +37,14 @@ services:
     restart: always
 
 volumes:
-  redis_data:
-    name: redis_data_volume
+  redis_server_volume:
+    name: redis_server_volume
     driver: local
-  insight_data:
+  redis_insight_volume:
     name: redis_insight_volume
     driver: local
 
 networks:
-  net:
+  redis_network:
     name: redis_network
     driver: bridge

@@ -151,7 +151,7 @@ docker-compose up -d
 > 
 > **Example**
 > ```redis.conf
-> requirepass <your password
+> requirepass <your password>
 > ``` 
 
 **Step 4:** Start server
