@@ -10,9 +10,13 @@ This repository made for build simple of Redis with docker.
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
 ## Project
-1. [Redis](./redis)
-2. [Redis Stack](./redis-stack)
-3. [Redis Server](./redis-stack-server) 
+
+
+| #   | Project            | Description                                                                                        |             Link             |
+|:----|:-------------------|----------------------------------------------------------------------------------------------------|:----------------------------:|
+| 1   | Redis              | For standalone redis without any module                                                            |       [Link](./redis)        |
+| 2   | Redis Stack        | For redis with all module include redis insight but connect only this redis stack server           |    [Link](./redis-stack)     |
+| 3   | Redis Stack Server | For redis with all module but can specific redis insight version and connect multiple redis server | [Link](./redis-stack-server) |
 
 ## Contributor
 [![GithubImg](https://img.shields.io/badge/Harin3Bone-181717?style=flat&logo=github&logoColor=ffffff)](https://github.com/Harin3Bone)
