@@ -10,7 +10,7 @@ do
     sleep 1
 done
 
-echo "Starting Redis server..."
+echo "Starting Redis Stack Service ..."
 
 docker-compose up -d 
 
@@ -20,15 +20,11 @@ do
     sleep 1 
 done
 
-echo "Starting Redis insight..."
-
-docker-compose up -d 
+rm .env
 
 sleep 1 
 
-echo "Redis server running http://localhost:6379"
-echo "Redis management running http://localhost:8001"
-echo "username: root"
+echo "Redis stack server running http://localhost:6379"
+echo "Redis insight running http://localhost:8001"
+echo "username: default"
 echo "password: password"
-
-sleep 1
